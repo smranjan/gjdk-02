@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+    environment {
+        DOCKER_TAG = getDockerTag()
+    }
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build . -t mylabfs/gjd_pl_03:${DOCKER_TAG}"
+            }
+        }
+        stage('DockerHub Push') {
+            steps {
+                withCredentials([string(credentialsId: 'docker-hub-mylabfs'), variable: 'dockerHubMylabfsPwd'])) {
+                sh "docker login -u mylabfs -p ${dockerHubMylabfsPwd}"
+                sh "docker push mylabfs/myapp:${DOCKER_TAG}"
+                } 
+            }
+        }
+        stage('Deploy Docker Image') {
+            steps {
+                script {
+                    try {
+                        sh "docker container rm -f gjd_pl_03"
+                        sh "docker container run -d --name gjd_pl_03 -p 90:80 mylabfs/gjd_pl_03:${DOCKER_TAG}"
+                    }catch(error) {
+                        sh "docker container run -d --name gjd_pl_03 -p 90:80 mylabfs/gjd_pl_03:${DOCKER_TAG}"
+                    }
+                }
+            }
+        }
+    }
+}
+
+def getDockerTag() {
+    git url: 'https://github.com/smranjan/git-jenkins-docker.git', branch: 'master'
+    def tag = sh script: 'git rev-parse HEAD', returnStdout: true
+    return tag
+}

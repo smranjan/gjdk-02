@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nodeapp
+  labels:
+    app: nodeapp
+spec:
+  containers:
+    - name: nodeapp
+      image: smranjan/gjdk_01:tagVersion
+      ports:
+        - containerPort: 8090
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-nodeapp
+spec:
+  type: NodePort
+  ports:
+    - port: 3050              #This is the port to use by other Pods to reach target port
+      targetPort: 80          #This is the port the destination Pods is listening on
+      nodePort: 31000         #Port to use from your Desktop/Laptop/ClusterNodes
+  selector:
+    app: nodeapp
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: nodeapp
+# spec:
+#   selector:
+#     app: nodeapp
+#   ports:
+#   - protocol: TCP
+#     port: 80
+#     targetPort: 8090
+#   type: LoadBalancer
+
+#Testing
+ #Make changes to mylabfs/index.html
+ #Push code to Git
+ #Auto/Manual Build Using Jenkins
+ #Check 'kubectl get pods,svc -o wide'
+ #http://<mini_kube_ip_address>:31000/mylabfs
