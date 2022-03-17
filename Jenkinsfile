@@ -7,7 +7,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sshagent(['kubemaster']) {
-                sh "docker build . -t smranjan/gjdk_01:${DOCKER_TAG}"
+                sh "docker build . -t smranjan/gjdk_02:${DOCKER_TAG}"
                 }
             }
         }
@@ -15,7 +15,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'dockerHubsmranjanPwd', variable: 'dockerHubsmranjanPwd')]) {
                 sh "docker login -u smranjan -p ${dockerHubsmranjanPwd}"
-                sh "docker push smranjan/gjdk_01:${DOCKER_TAG}"
+                sh "docker push smranjan/gjdk_02:${DOCKER_TAG}"
                 } 
             }
         }
