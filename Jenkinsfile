@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Build Docker Image') {
             steps {
-                sshagent(['s01-devs']) {
+                sshagent(['kubemaster']) {
                 sh "docker build . -t smranjan/gjdk_01:${DOCKER_TAG}"
                 }
             }
@@ -23,14 +23,13 @@ pipeline {
             steps {
                 sh "chmod +x changeTag.sh"
                 sh "./changeTag.sh ${DOCKER_TAG}"
-                sshagent(['s01-devs']) {
-                    //sh "ssh devs@10.10.1.10 mkdir /home/devs/k8s"
-                    sh "scp -Cr -o StrictHostKeyChecking=no k8s devs@10.10.1.10:/home/devs/"
+                sshagent(['kubemaster']) {
+                    sh "scp -Cr -o StrictHostKeyChecking=no k8s centos@10.10.1.30:/home/centos/"
                     script {
                         try {
-                            sh "ssh devs@10.10.1.10 kubectl apply -f k8s/."
+                            sh "ssh centos@10.10.1.30 kubectl apply -f k8s/."
                         }catch(error) {
-                            sh "ssh devs@10.10.1.10 kubectl create -f k8s/."
+                            sh "ssh centos@10.10.1.30 kubectl create -f k8s/."
                         }
                     }
                 }
