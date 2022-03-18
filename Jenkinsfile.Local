@@ -24,12 +24,12 @@ pipeline {
                 sh "chmod +x changeTag.sh"
                 sh "./changeTag.sh ${DOCKER_TAG}"
                 sshagent(['kubemaster']) {
-                    sh "scp -Cr -o StrictHostKeyChecking=no k8s centos@10.10.1.34:/home/centos/"
+                    sh "scp -Cr -o StrictHostKeyChecking=no k8s centos@10.10.1.30:/home/centos/"
                     script {
                         try {
-                            sh "ssh centos@10.10.1.34 kubectl apply -f k8s/."
+                            sh "ssh centos@10.10.1.30 kubectl apply -f k8s/."
                         }catch(error) {
-                            sh "ssh centos@10.10.1.34 kubectl create -f k8s/."
+                            sh "ssh centos@10.10.1.30 kubectl create -f k8s/."
                         }
                     }
                 }
